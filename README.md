@@ -21,8 +21,7 @@ The animation was inspired by natural seasonal changes and how they affect the e
 Technical Explanation:
 
 The animation uses p5.js to create and animate the elements.
-Weather effects are created using functions to generate rain and snow graphics.
-Seasonal changes are managed using localStorage to persist the state across page reloads.
+Weather effects are created using functions to generate rain and snow graphics and animations.
 I have additionally studied and used localStorage to manage the current season state of the animation. On each page refresh or reload, the next season is set based on the current season information and stored in localStorage for use during the next refresh.
 
 References：

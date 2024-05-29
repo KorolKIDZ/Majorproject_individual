@@ -11,11 +11,12 @@ class ResourceLoader {
     this.boatImage = loadImage('assets/transparent_boat.png');
     this.group1Image = loadImage('assets/Group 1.png');
     this.birdsImage = loadImage('assets/birds.png');
-    this.rainImage = this.createRainImage(); // 生成雨的图片
-    this.snowImage = this.createSnowImage(); // 生成雪的图片
+    this.rainImage = this.createRainImage(); // Generate rain image
+    this.snowImage = this.createSnowImage(); // Generate snow image
   }
 
   createRainImage() {
+    // Create rain effect with random lines
     let pg = createGraphics(windowWidth, windowHeight);
     pg.stroke(255);
     for (let i = 0; i < 200; i++) {
@@ -28,6 +29,7 @@ class ResourceLoader {
   }
 
   createSnowImage() {
+    // Create snow effect with random ellipses
     let pg = createGraphics(windowWidth, windowHeight);
     pg.fill(255);
     pg.noStroke();
@@ -64,27 +66,28 @@ class BackgroundDrawer {
   }
 
   drawGradientBackground() {
+    // Draw background gradient for each season
     let color1, color2;
     switch (this.season) {
       case 'spring':
-        color1 = color(135, 206, 235); // Light blue
-        color2 = color(255, 182, 193); // Light pink
+        color1 = color(135, 206, 235); 
+        color2 = color(255, 182, 193); 
         break;
       case 'summer':
-        color1 = color(0, 191, 255); // Deep sky blue
-        color2 = color(255, 255, 0); // Yellow
+        color1 = color(0, 191, 255); 
+        color2 = color(255, 255, 0); 
         break;
       case 'autumn':
-        color1 = color(255, 140, 0); // Dark orange
-        color2 = color(255, 69, 0); // Red orange
+        color1 = color(255, 140, 0); 
+        color2 = color(255, 69, 0); 
         break;
       case 'winter':
-        color1 = color(0, 191, 255); // Deep sky blue
-        color2 = color(255); // White
+        color1 = color(0, 191, 255); 
+        color2 = color(255); 
         break;
       default:
-        color1 = color(135, 206, 235); // Default color to avoid undefined
-        color2 = color(255, 182, 193); // Default color to avoid undefined
+        color1 = color(135, 206, 235); 
+        color2 = color(255, 182, 193); 
     }
 
     for (let y = 0; y < height; y++) {
@@ -96,6 +99,7 @@ class BackgroundDrawer {
   }
 
   drawLayeredMountains() {
+    // Draw layered mountains for each season
     let layers = 5;
     let maxHeight = height / 6;
     let noiseScale = 0.01;
@@ -178,6 +182,7 @@ class Boat {
   }
 
   draw() {
+    // Animate boat position based on the season
     let boatX;
     switch (this.season) {
       case 'spring':
@@ -211,12 +216,14 @@ class Overlay {
   }
 
   draw() {
-    if (this.season === 'winter') return; // 冬天时不显示鸽子群和单个鸽子
+    // Do not display birds in winter
+    if (this.season === 'winter') return;
 
+    // Animate birds and single bird positions based on the season
     let birdX;
     let singleBirdX;
-    let singleBirdY = 150; // 调整单个鸽子的垂直位置，使其与鸽子群区分开
-    let singleBirdScale = 1.5; // 放大单个鸽子
+    let singleBirdY = 150; // Adjust single bird vertical position to separate from bird group
+    let singleBirdScale = 1.5; // Scale up single bird
     switch (this.season) {
       case 'spring':
         birdX = 0;
@@ -235,12 +242,13 @@ class Overlay {
         singleBirdX = 0;
     }
 
-    image(this.group1Image, singleBirdX, singleBirdY, this.group1Image.width * singleBirdScale, this.group1Image.height * singleBirdScale); // 添加放大后的单个鸽子的绘制
-    image(this.birdsImage, birdX, 0, 300, 150);
+    image(this.group1Image, singleBirdX, singleBirdY, this.group1Image.width * singleBirdScale, this.group1Image.height * singleBirdScale); // Draw scaled-up single bird
+    image(this.birdsImage, birdX, 0, 300, 150); // Draw bird group
   }
 }
 
 function getNextSeason() {
+  // Determine the next season
   const seasons = ['spring', 'summer', 'autumn', 'winter'];
   let currentSeason = localStorage.getItem('currentSeason');
   if (!currentSeason) {
@@ -268,7 +276,7 @@ function preload() {
 function setup() {
   canvasManager.setup();
   boat = new Boat(resourceLoader.boatImage, season);
-  overlay = new Overlay(resourceLoader.group1Image, resourceLoader.birdsImage, season); // 使用 group1Image 作为单个鸽子的图像
+  overlay = new Overlay(resourceLoader.group1Image, resourceLoader.birdsImage, season); // Use group1Image as the single bird image
 }
 
 function draw() {
@@ -277,10 +285,10 @@ function draw() {
   boat.draw();
   overlay.draw();
   if (season === 'autumn') {
-    image(resourceLoader.rainImage, 0, 0); // 绘制雨
+    image(resourceLoader.rainImage, 0, 0); // Draw rain in autumn
   }
   if (season === 'winter') {
-    image(resourceLoader.snowImage, 0, 0); // 绘制雪
+    image(resourceLoader.snowImage, 0, 0); // Draw snow in winter
   }
 }
 

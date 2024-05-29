@@ -17,7 +17,9 @@ I adjusted the positions of the birds, bird group, and boat based on different s
 Inspiration：
 
 The animation was inspired by natural seasonal changes and how they affect the environment.
-Technical Explanation
+
+Technical Explanation:
+
 The animation uses p5.js to create and animate the elements.
 Weather effects are created using functions to generate rain and snow graphics.
 Seasonal changes are managed using localStorage to persist the state across page reloads.

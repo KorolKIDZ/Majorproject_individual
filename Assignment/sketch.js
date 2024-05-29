@@ -3,55 +3,24 @@ class ResourceLoader {
     this.boatImage = null;
     this.group1Image = null;
     this.birdsImage = null;
-    this.rainImage = null;
-    this.snowImage = null;
+    this.rainDrops = []; // Array to hold rain drops
+    this.snowflakes = []; // Array to hold snowflakes
   }
 
   preload() {
     this.boatImage = loadImage('assets/transparent_boat.png');
     this.group1Image = loadImage('assets/Group 1.png');
     this.birdsImage = loadImage('assets/birds.png');
-    this.rainImage = this.createRainImage(); // Generate rain image
-    this.snowImage = this.createSnowImage(); // Generate snow image
-  }
-
-  createRainImage() {
-    // Create rain effect with random lines
-    let pg = createGraphics(windowWidth, windowHeight);
-    pg.stroke(255);
-    for (let i = 0; i < 200; i++) {
-      let x = random(windowWidth);
-      let y = random(windowHeight);
-      let len = random(10, 20);
-      pg.line(x, y, x, y + len);
-    }
-    return pg;
-  }
-
-  createSnowImage() {
-    // Create snow effect with random ellipses
-    let pg = createGraphics(windowWidth, windowHeight);
-    pg.fill(255);
-    pg.noStroke();
-    for (let i = 0; i < 300; i++) {
-      let x = random(windowWidth);
-      let y = random(windowHeight);
-      let size = random(3, 7);
-      pg.ellipse(x, y, size);
-    }
-    return pg;
   }
 }
 
 class CanvasManager {
   setup() {
     createCanvas(windowWidth, windowHeight);
-    noLoop();
   }
 
   windowResized() {
     resizeCanvas(windowWidth, windowHeight);
-    redraw();
   }
 }
 
@@ -179,6 +148,7 @@ class Boat {
     this.boatImage = boatImage;
     this.boatScale = 0.7;
     this.season = season;
+    this.angle = 0; // Angle for the floating effect
   }
 
   draw() {
@@ -201,7 +171,10 @@ class Boat {
         boatX = 100;
     }
 
-    let boatY = height - this.boatImage.height * this.boatScale + 50;
+    // Calculate vertical position with a sine wave for floating effect
+    let boatY = height - this.boatImage.height * this.boatScale + 50 + sin(this.angle) * 5;
+    this.angle += 0.05; // Increment angle for the next frame
+
     tint(150, 150, 150, 150);
     image(this.boatImage, boatX, boatY, this.boatImage.width * this.boatScale, this.boatImage.height * this.boatScale);
     noTint();
@@ -247,6 +220,53 @@ class Overlay {
   }
 }
 
+class RainDrop {
+  constructor() {
+    this.x = random(width);
+    this.y = random(-200, -10); // Increase starting range to fill the screen more evenly
+    this.len = random(10, 20);
+    this.yspeed = random(5, 10); // Increase the rain drops speed
+  }
+
+  fall() {
+    this.y = this.y + this.yspeed;
+    if (this.y > height) {
+      this.y = random(-200, -10); // Increase starting range to fill the screen more evenly
+      this.x = random(width); // Randomize x position to ensure coverage
+      this.yspeed = random(5, 10); // Increase the rain drops speed
+    }
+  }
+
+  show() {
+    stroke(255);
+    line(this.x, this.y, this.x, this.y + this.len);
+  }
+}
+
+class Snowflake {
+  constructor() {
+    this.posX = random(width);
+    this.posY = random(-50, 0);
+    this.size = random(2, 5); // Decrease snowflake size
+    this.yspeed = random(1, 2); // Slow down the snowflakes for gentle falling effect
+  }
+
+  fall() {
+    this.posY += this.yspeed;
+
+    if (this.posY > height) {
+      this.posY = random(-50, 0);
+      this.posX = random(width);
+    }
+  }
+
+  display() {
+    fill(255); // Make the snowflakes white for better visibility
+    noStroke();
+    ellipse(this.posX, this.posY, this.size);
+  }
+}
+
 function getNextSeason() {
   // Determine the next season
   const seasons = ['spring', 'summer', 'autumn', 'winter'];
@@ -268,6 +288,8 @@ let backgroundDrawer = new BackgroundDrawer(season);
 let waterSurface = new WaterSurface();
 let boat;
 let overlay;
+let rainDrops = [];
+let snowflakes = [];
 
 function preload() {
   resourceLoader.preload();
@@ -277,6 +299,19 @@ function setup() {
   canvasManager.setup();
   boat = new Boat(resourceLoader.boatImage, season);
   overlay = new Overlay(resourceLoader.group1Image, resourceLoader.birdsImage, season); // Use group1Image as the single bird image
+
+  // Initialize rain drops and snowflakes based on the season
+  if (season === 'autumn') {
+    for (let i = 0; i < 200; i++) { // Decrease the number of rain drops
+      rainDrops[i] = new RainDrop();
+    }
+  }
+
+  if (season === 'winter') {
+    for (let i = 0; i < 100; i++) { // Decrease the number of snowflakes
+      snowflakes[i] = new Snowflake();
+    }
+  }
 }
 
 function draw() {
@@ -284,11 +319,19 @@ function draw() {
   waterSurface.draw();
   boat.draw();
   overlay.draw();
+
   if (season === 'autumn') {
-    image(resourceLoader.rainImage, 0, 0); // Draw rain in autumn
+    for (let drop of rainDrops) {
+      drop.fall();
+      drop.show();
+    }
   }
+
   if (season === 'winter') {
-    image(resourceLoader.snowImage, 0, 0); // Draw snow in winter
+    for (let flake of snowflakes) {
+      flake.fall();
+      flake.display();
+    }
   }
 }
 
